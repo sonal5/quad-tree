@@ -1,0 +1,235 @@
+// C++ Implementation of Quad Tree 
+#include <iostream> 
+#include <cmath> 
+using namespace std; 
+  
+// details of a camp point 
+struct cp 
+{ 
+    int x; 
+    int y; 
+    cp(int x1, int y1) 
+    { 
+        x = x1; 
+        y = y1; 
+    } 
+    cp() 
+    { 
+        x = 0; 
+        y = 0; 
+    } 
+}; 
+  
+// The objects that we want stored in the quadtree 
+struct Node 
+{ 
+    cp pos; 
+    int data; 
+    Node(Point p, int info) 
+    { 
+        pos = p; 
+        data = info; 
+    } 
+    Node() 
+    { 
+        data = 0; 
+    } 
+}; 
+  
+// The main quadtree class 
+class Tree 
+{ 
+    // Hold details of the boundary of this node 
+    Point topLeft; 
+    Point botRight; 
+  
+    // Contains details of node 
+    Node *n; 
+  
+    // Children of this tree 
+    Tree *topLTree; 
+    Tree *topRTree; 
+    Tree *botLTree; 
+    Tree *botRTree; 
+  
+public: 
+    Tree() 
+    { 
+        topLeft = Point(0, 0); 
+        botRight = Point(0, 0); 
+        n = NULL; 
+        topLTree  = NULL; 
+        topRTree = NULL; 
+        botLTree  = NULL; 
+        botRTree = NULL; 
+    } 
+    Tree(Point topL, Point botR) 
+    { 
+        n = NULL; 
+        topLTree  = NULL; 
+        topRTree = NULL; 
+        botLTree  = NULL; 
+        botRTree = NULL; 
+        topLeft = topL; 
+        botRight = botR; 
+    } 
+    void insert(Node*); 
+    Node* search(Point); 
+    bool inBoundary(Point); 
+}; 
+  
+// Insert a node into quad tree 
+void Tree::insert(Node *node) 
+{ 
+    if (node == NULL) 
+        return; 
+  
+    // Current quad cannot contain it 
+    if (!inBoundary(node->pos)) 
+        return; 
+  
+    // now at a quad of unit area 
+    // cannot subdivide this area quad further 
+    if (abs(topLeft.x - botRight.x) <= 1 && 
+        abs(topLeft.y - botRight.y) <= 1) 
+    { 
+        if (n == NULL) 
+            n = node; 
+        return; 
+    } 
+  
+    if ((topLeft.x + botRight.x) / 2 >= node->pos.x) 
+    { 
+        // top Left Tree 
+        if ((topLeft.y + botRight.y) / 2 >= node->pos.y) 
+        { 
+            if (topLTree == NULL) 
+                topLTree = new Tree( 
+                    Point(topLeft.x, topLeft.y), 
+                    Point((topLeft.x + botRight.x) / 2, 
+                        (topLeft.y + botRight.y) / 2)); 
+            topLTree->insert(node); 
+        } 
+  
+        // bottom Left Tree 
+        else
+        { 
+            if (botLTree == NULL) 
+                botLTree = new Tree( 
+                    Point(topLeft.x, 
+                        (topLeft.y + botRight.y) / 2), 
+                    Point((topLeft.x + botRight.x) / 2, 
+                        botRight.y)); 
+            botLTree->insert(node); 
+        } 
+    } 
+    else
+    { 
+        // top Right Tree 
+        if ((topLeft.y + botRight.y) / 2 >= node->pos.y) 
+        { 
+            if (topRTree == NULL) 
+                topRTree = new Tree( 
+                    Point((topLeft.x + botRight.x) / 2, 
+                        topLeft.y), 
+                    Point(botRight.x, 
+                        (topLeft.y + botRight.y) / 2)); 
+            topRTree->insert(node); 
+        } 
+  
+        // bottom Right Tree 
+        else
+        { 
+            if (botRTree == NULL) 
+                botRTree = new Tree( 
+                    Point((topLeft.x + botRight.x) / 2, 
+                        (topLeft.y + botRight.y) / 2), 
+                    Point(botRight.x, botRight.y)); 
+            botRTree->insert(node); 
+        } 
+    } 
+} 
+  
+// Find a node in a quadtree 
+Node* Tree::search(Point p) 
+{ 
+    // Current quad cannot contain it 
+    if (!inBoundary(p)) 
+        return NULL; 
+  
+    // We are at a quad of unit length 
+    // We cannot subdivide this quad further 
+    if (n != NULL) 
+        return n; 
+  
+    if ((topLeft.x + botRight.x) / 2 >= p.x) 
+    { 
+        // Indicates topLeftTree 
+        if ((topLeft.y + botRight.y) / 2 >= p.y) 
+        { 
+            if (topLTree == NULL) 
+                return NULL; 
+            return topLTree->search(p); 
+        } 
+        // Indicates botLeftTree 
+        else
+        { 
+            if (botLTree == NULL) 
+                return NULL; 
+            return botLTree->search(p); 
+        } 
+    } 
+    else
+    { 	// Indicates topRightTree 
+        if ((topLeft.y + botRight.y) / 2 >= p.y) 
+        { 
+            if (topRTree == NULL) 
+                return NULL; 
+            return topRTree->search(p); 
+        } 
+  
+        // Indicates botRightTree 
+        else
+        { 
+            if (botRTree == NULL) 
+                return NULL; 
+            return botRTree->search(p); 
+        } 
+    } 
+}; 
+  
+// Check if current quadtree contains the point 
+bool Tree::inBoundary(Point p) 
+{ 
+    return (p.x >= topLeft.x && 
+        p.x <= botRight.x && 
+        p.y >= topLeft.y && 
+        p.y <= botRight.y); 
+} 
+  
+// Driver program 
+int main() 
+{ 
+    Tree center(Point(0, 0), Point(10, 10)); 
+    Node a(Point(2, 1), 1); 
+    Node b(Point(5, 2), 2); 
+    Node c(Point(7, 6), 3); 
+    Node d(Point(2, 3), 2); 
+    Node e(Point(9, 4), 8); 
+    Node f(Point(2, 6), 6); 
+    center.insert(&a); //insert node a
+    center.insert(&b); 
+    center.insert(&c); 
+    center.insert(&d); 
+    center.insert(&e); 
+    center.insert(&f); 
+    cout<<"Node a: "<<center.search(Point(2, 1))->data<<"\n";  // searching node a
+    cout<<"Node b: "<<center.search(Point(5, 2))->data<<"\n"; 
+    cout<<"Node c: "<< center.search(Point(7, 6))->data<<"\n";        
+    cout<<"Node d: "<< center.search(Point(2, 3))->data<<"\n"; 
+    cout<<"Node e: "<< center.search(Point(9, 4))->data<<"\n"; 
+    cout<<"Node f: "<< center.search(Point(2, 6))->data<<"\n";
+    cout<<"\n boundary "<<center.inBoundary(Point(7,6));
+    cout<< "\n Non-existing node:"<< center.search(Point(5, 5)); 
+    return 0; 
+}
