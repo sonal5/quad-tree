@@ -1,4 +1,3 @@
-// C++ Implementation of Quad Tree 
 #include <iostream> 
 #include <cmath> 
 using namespace std; 
@@ -25,7 +24,7 @@ struct Node
 { 
     cp pos; 
     int data; 
-    Node(Point p, int info) 
+    Node(cp p, int info) 
     { 
         pos = p; 
         data = info; 
@@ -40,8 +39,8 @@ struct Node
 class Tree 
 { 
     // Hold details of the boundary of this node 
-    Point topLeft; 
-    Point botRight; 
+    cp topLeft; 
+    cp botRight; 
   
     // Contains details of node 
     Node *n; 
@@ -55,15 +54,15 @@ class Tree
 public: 
     Tree() 
     { 
-        topLeft = Point(0, 0); 
-        botRight = Point(0, 0); 
+        topLeft = cp(0, 0); 
+        botRight = cp(0, 0); 
         n = NULL; 
         topLTree  = NULL; 
         topRTree = NULL; 
         botLTree  = NULL; 
         botRTree = NULL; 
     } 
-    Tree(Point topL, Point botR) 
+    Tree(cp topL, cp botR) 
     { 
         n = NULL; 
         topLTree  = NULL; 
@@ -74,8 +73,8 @@ public:
         botRight = botR; 
     } 
     void insert(Node*); 
-    Node* search(Point); 
-    bool inBoundary(Point); 
+    Node* search(cp); 
+    bool inBoundary(cp); 
 }; 
   
 // Insert a node into quad tree 
@@ -105,8 +104,8 @@ void Tree::insert(Node *node)
         { 
             if (topLTree == NULL) 
                 topLTree = new Tree( 
-                    Point(topLeft.x, topLeft.y), 
-                    Point((topLeft.x + botRight.x) / 2, 
+                    cp(topLeft.x, topLeft.y), 
+                    cp((topLeft.x + botRight.x) / 2, 
                         (topLeft.y + botRight.y) / 2)); 
             topLTree->insert(node); 
         } 
@@ -116,9 +115,9 @@ void Tree::insert(Node *node)
         { 
             if (botLTree == NULL) 
                 botLTree = new Tree( 
-                    Point(topLeft.x, 
+                    cp(topLeft.x, 
                         (topLeft.y + botRight.y) / 2), 
-                    Point((topLeft.x + botRight.x) / 2, 
+                    cp((topLeft.x + botRight.x) / 2, 
                         botRight.y)); 
             botLTree->insert(node); 
         } 
@@ -130,9 +129,9 @@ void Tree::insert(Node *node)
         { 
             if (topRTree == NULL) 
                 topRTree = new Tree( 
-                    Point((topLeft.x + botRight.x) / 2, 
+                    cp((topLeft.x + botRight.x) / 2, 
                         topLeft.y), 
-                    Point(botRight.x, 
+                    cp(botRight.x, 
                         (topLeft.y + botRight.y) / 2)); 
             topRTree->insert(node); 
         } 
@@ -142,16 +141,16 @@ void Tree::insert(Node *node)
         { 
             if (botRTree == NULL) 
                 botRTree = new Tree( 
-                    Point((topLeft.x + botRight.x) / 2, 
+                    cp((topLeft.x + botRight.x) / 2, 
                         (topLeft.y + botRight.y) / 2), 
-                    Point(botRight.x, botRight.y)); 
+                    cp(botRight.x, botRight.y)); 
             botRTree->insert(node); 
         } 
     } 
 } 
   
 // Find a node in a quadtree 
-Node* Tree::search(Point p) 
+Node* Tree::search(cp p) 
 { 
     // Current quad cannot contain it 
     if (!inBoundary(p)) 
@@ -199,7 +198,7 @@ Node* Tree::search(Point p)
 }; 
   
 // Check if current quadtree contains the point 
-bool Tree::inBoundary(Point p) 
+bool Tree::inBoundary(cp p) 
 { 
     return (p.x >= topLeft.x && 
         p.x <= botRight.x && 
@@ -210,26 +209,26 @@ bool Tree::inBoundary(Point p)
 // Driver program 
 int main() 
 { 
-    Tree center(Point(0, 0), Point(10, 10)); 
-    Node a(Point(2, 1), 1); 
-    Node b(Point(5, 2), 2); 
-    Node c(Point(7, 6), 3); 
-    Node d(Point(2, 3), 2); 
-    Node e(Point(9, 4), 8); 
-    Node f(Point(2, 6), 6); 
+    Tree center(cp(0, 0), cp(10, 10)); 
+    Node a(cp(2, 1), 1); 
+    Node b(cp(5, 2), 2); 
+    Node c(cp(7, 6), 3); 
+    Node d(cp(2, 3), 2); 
+    Node e(cp(9, 4), 8); 
+    Node f(cp(2, 6), 6); 
     center.insert(&a); //insert node a
     center.insert(&b); 
     center.insert(&c); 
     center.insert(&d); 
     center.insert(&e); 
     center.insert(&f); 
-    cout<<"Node a: "<<center.search(Point(2, 1))->data<<"\n";  // searching node a
-    cout<<"Node b: "<<center.search(Point(5, 2))->data<<"\n"; 
-    cout<<"Node c: "<< center.search(Point(7, 6))->data<<"\n";        
-    cout<<"Node d: "<< center.search(Point(2, 3))->data<<"\n"; 
-    cout<<"Node e: "<< center.search(Point(9, 4))->data<<"\n"; 
-    cout<<"Node f: "<< center.search(Point(2, 6))->data<<"\n";
-    cout<<"\n boundary "<<center.inBoundary(Point(7,6));
-    cout<< "\n Non-existing node:"<< center.search(Point(5, 5)); 
+    cout<<"Node a: "<<center.search(cp(2, 1))->data<<"\n";  // searching node a
+    cout<<"Node b: "<<center.search(cp(5, 2))->data<<"\n"; 
+    cout<<"Node c: "<< center.search(cp(7, 6))->data<<"\n";        
+    cout<<"Node d: "<< center.search(cp(2, 3))->data<<"\n"; 
+    cout<<"Node e: "<< center.search(cp(9, 4))->data<<"\n"; 
+    cout<<"Node f: "<< center.search(cp(2, 6))->data<<"\n";
+    cout<<"\n boundary "<<center.inBoundary(cp(7,6));
+    cout<< "\n Non-existing node:"<< center.search(cp(5, 5)); 
     return 0; 
 }
